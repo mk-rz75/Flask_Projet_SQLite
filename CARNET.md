@@ -85,19 +85,19 @@
 
 1. Quelles étaient les deux anomalies du formulaire d'origine, et d'où venaient-elles ?
 
-   > _Ma réponse :_ 
+   > _Ma réponse : la 1ère anomalie était l'adresse était toujours « ICI », et la 2ème était la date de création du compte qui affiché (1002938). Ça venait du fait que le programme utilisait toujours « ICI » et 1002938, peu importe ce que l'utilisateur tapait.
 
 2. Pourquoi la validation côté **navigateur** (`required`) ne suffit-elle pas ? Pourquoi la garder quand même ?
 
-   > _Ma réponse :_ 
+   > _Ma réponse : Parce que n'importe qui peut l'enlever avec F12. Je l'ai testé, et j'ai réussi à enregistrer un client sans nom. Il faut aussi vérifier côté serveur. On garde required parce que c'est pratique pour l'utilisateur normal, il voit tout de suite qu'il a oublié un champ.
 
 3. À quoi sert `conn.commit()` ? Que se passe-t-il sans lui ?
 
-   > _Ma réponse :_ 
+   > _Ma réponse : commit() sert à valider les changements et à les enregistrer pour de vrai dans la base. Quand je l'ai mis en #, le client que j'ai ajouté n'apparaissait pas dans la liste. Sans lui, rien n'est sauvegardé.
 
 4. Pourquoi redirige-t-on vers `/consultation/` après l'enregistrement, au lieu d'afficher directement une page ? (Indice : essayez d'appuyer sur F5 après l'envoi.)
 
-   > _Ma réponse :_ 
+   > _Ma réponse : Pour éviter les doublons. Sans redirection, si on appuie sur F5 après avoir enregistré un client, le formulaire est renvoyé et le client est créé une deuxième fois. Avec la redirection, F5 recharge juste la liste des clients, sans rien ajouter.
 
 ---
 
