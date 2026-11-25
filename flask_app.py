@@ -149,6 +149,29 @@ def supprimer_client(id):
     conn.commit()
     conn.close()
     return redirect('/consultation/')
+
+@app.route('/modifier_client/<int:id>', methods=['GET', 'POST'])
+def modifier_client(id):
+    conn = get_db()
+    cursor = conn.cursor()
+
+    if request.method == 'POST':
+        cursor.execute('UPDATE clients SET nom = ?, prenom = ?, adresse = ? WHERE id = ?',
+                       (request.form['nom'].strip().upper(),
+                        request.form['prenom'].strip(),
+                        request.form['adresse'].strip(),
+                        id))
+        conn.commit()
+        conn.close()
+        return redirect('/consultation/')
+
+    cursor.execute('SELECT * FROM clients WHERE id = ?', (id,))
+    client = cursor.fetchone()
+    conn.close()
+    if client is None:
+        return "<h2>Client introuvable</h2>", 404
+    return render_template('modifier_client.html', client=client)
+
 # ---------------------------------------------------------------
 #  Ne pas modifier : utile seulement pour lancer le site
 #  sur votre propre ordinateur (python flask_app.py)

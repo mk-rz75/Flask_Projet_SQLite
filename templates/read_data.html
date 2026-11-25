@@ -29,6 +29,7 @@
             <td>{{ row['prenom'] }}</td>
             <td>{{ row['adresse'] }}</td>
                         <td>
+                            <a href="/modifier_client/{{ row['id'] }}">✏️ Modifier</a>
                 <form action="/supprimer_client/{{ row['id'] }}" method="post"
                       onsubmit="return confirm('Supprimer ce client ?');">
                     <button type="submit">🗑️ Supprimer</button>
