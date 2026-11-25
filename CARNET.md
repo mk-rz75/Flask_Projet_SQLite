@@ -61,19 +61,19 @@
 
 1. Quelle est la différence entre `WHERE nom = 'DUPONT'` et `WHERE nom LIKE '%DUP%'` ?
 
-   > _Ma réponse :_ 
+   > _Ma réponse : Le = est très strict, il faut écrire le nom exactement. Par exemple, si je tape dupont en minuscules, il ne trouve rien. Le LIKE est plus simple : il cherche tous les noms qui contiennent "DUP" quelque part, et il ne fait pas attention aux majuscules.
 
 2. Expliquez avec vos mots ce qu'est une **injection SQL**. Qu'est-ce qu'un pirate pourrait faire de pire qu'afficher tous les clients ?
 
-   > _Ma réponse :_ 
+   > _Ma réponse : C'est quand quelqu'un réussit à glisser son propre bout de SQL dans la requête du site, parce que le développeur a collé directement ce que l'utilisateur tape. En testant x' OR '1'='1, j'ai vu que tous les clients s'affichaient, alors qu'aucun ne s'appelle "x".
 
 3. Pourquoi la version avec `?` est-elle protégée contre l'injection ?
 
-   > _Ma réponse :_ 
+   > _Ma réponse : : Avec le ?, ce que l'utilisateur tape est toujours pris comme du texte, jamais comme du code SQL. Donc même si quelqu'un essaie une injection, la base cherche juste un nom bizarre et ne trouve rien.
 
 4. Pour la recherche, on a utilisé `method="get"`. Quel avantage pour l'utilisateur ? (Indice : favoris, partage de lien.)
 
-   > _Ma réponse :_ 
+   > _Ma réponse : Avec GET, la recherche s'affiche directement dans l'URL, par exemple /recherche?q=ma. C'est pratique, on peut envoyer le lien à quelqu'un, ou revenir en arrière et retrouver la même recherche.
 
 🧩 **Défi** — mes requêtes / ma solution :
 
