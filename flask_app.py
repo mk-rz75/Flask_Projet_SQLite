@@ -140,17 +140,15 @@ def recherche():
         conn.close()
     return render_template('recherche.html', q=q, data=data)
 
-@app.route('/fiche_nom_dangereuse/<nom>')
-def fiche_nom_dangereuse(nom):
+
+@app.route('/supprimer_client/<int:id>', methods=['POST'])
+def supprimer_client(id):
     conn = get_db()
     cursor = conn.cursor()
-    requete = "SELECT * FROM clients WHERE nom = '" + nom + "'"
-    print(requete, flush=True)
-    cursor.execute(requete)
-    data = cursor.fetchall()
+    cursor.execute('DELETE FROM clients WHERE id = ?', (id,))
+    conn.commit()
     conn.close()
-    return render_template('read_data.html', data=data)
-
+    return redirect('/consultation/')
 # ---------------------------------------------------------------
 #  Ne pas modifier : utile seulement pour lancer le site
 #  sur votre propre ordinateur (python flask_app.py)

@@ -19,6 +19,7 @@
             <th>Nom</th>
             <th>Prénom</th>
             <th>Adresse</th>
+            <th>Actions</th>
         </tr>
         {% for row in data %}
         <tr>
@@ -27,6 +28,12 @@
             <td><a href="/fiche_client/{{ row['id'] }}">{{ row['nom'] }}</a></td>
             <td>{{ row['prenom'] }}</td>
             <td>{{ row['adresse'] }}</td>
+                        <td>
+                <form action="/supprimer_client/{{ row['id'] }}" method="post"
+                      onsubmit="return confirm('Supprimer ce client ?');">
+                    <button type="submit">🗑️ Supprimer</button>
+                </form>
+            </td>
         </tr>
         {% endfor %}
     </table>
