@@ -7,6 +7,9 @@
 </head>
 <body>
     <h1>Enregistrer un nouveau client</h1>
+        {% if erreur %}
+        <p style="color: red;">{{ erreur }}</p>
+    {% endif %}
     <form action="./enregistrer_client" method="POST">
         <label for="nom">Nom :</label>
         <input type="text" id="nom" name="nom" required><br><br>
