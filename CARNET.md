@@ -145,19 +145,19 @@
 
 1. Qu'est-ce qu'une **clé étrangère** ? Dans quelle table se trouve-t-elle ici, et pourquoi pas dans l'autre ?
 
-   > _Ma réponse :_ 
+   > _Ma réponse : C'est une colonne qui fait le lien avec une autre table. Ici c'est client_id dans commandes. Elle est dans commandes parce qu'une commande appartient à un seul client, alors qu'un client peut avoir plusieurs commandes.
 
 2. Pourquoi est-ce une mauvaise idée de créer des colonnes `commande1`, `commande2`… dans la table `clients` ?
 
-   > _Ma réponse :_ 
+   > _Ma réponse : : Parce qu'on sait pas combien de commandes un client va avoir. S'il en a 50 il faudrait 50 colonnes, et la plupart seraient vides.
 
 3. À quoi sert un `JOIN` ? Et un `GROUP BY` ?
 
-   > _Ma réponse :_ 
+   > _Ma réponse : JOIN sert à relier deux tables, par exemple pour afficher le nom du client à côté de sa commande. GROUP BY sert à regrouper les lignes, par exemple pour compter les commandes et faire le total par client.
 
 4. Pour la bibliothèque, quelles tables imaginez-vous ? Lesquelles contiendront des clés étrangères ?
 
-   > _Ma réponse :_ 
+   > _Ma réponse : Une table livres, une table utilisateurs et une table emprunts. C'est emprunts qui aura les clés étrangères, livre_id et utilisateur_id. 
 
 ---
 
