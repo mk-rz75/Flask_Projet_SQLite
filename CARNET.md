@@ -1,12 +1,12 @@
 # 📒 Mon carnet de bord
 
-**Nom :** 
+**Nom :KASDI
 
-**Prénom :** 
+**Prénom : Mohamed
 
-**Adresse de mon site :** https://______.pythonanywhere.com
+**Adresse de mon site : https://mkrz75.pythonanywhere.com/
 
-**Adresse de mon dépôt GitHub :** https://github.com/______
+**Adresse de mon dépôt GitHub : https://github.com/mk-rz75/Flask_Projet_SQLite
 
 > Modifiez ce fichier directement sur GitHub (icône crayon ✏️) pour répondre aux questions de chaque exercice.
 > Écrivez avec vos propres mots : une réponse courte et juste vaut mieux qu'un long copier-coller ! 🙂
@@ -17,19 +17,19 @@
 
 1. Expliquez avec vos mots la différence entre une **table**, une **colonne** et une **ligne**.
 
-   > _Ma réponse :_ 
+   > _Ma réponse :_ Une table est tableau qui regroupe les information. Une colonne c'est les informations de chaque personne tels que : nom,. prenom, adresse. Une ligne c'est une recherche précise de la personne.
 
 2. À quoi sert la clé primaire `id` ? Pourquoi ne pas simplement identifier un client par son nom ?
 
-   > _Ma réponse :_ 
+   > _Ma réponse : Car l'id est une identification unique n'ayant pas de doublon. On peux identifier un client par son nom mais son nom n'est pas unique il peux en exister plusieurs.
 
 3. Pourquoi votre client ajouté en console est-il apparu sur le site ?
 
-   > _Ma réponse :_ 
+   > _Ma réponse : Le client apparaît sur le site parce que le site et la console SQL utilisent la même base de données.
 
 4. Que signifie `NOT NULL` dans `schema.sql` ? Quelle erreur avez-vous obtenue avec `INSERT INTO clients (nom) VALUES ('TEST');` ?
 
-   > _Ma réponse :_ 
+   > _Ma réponse : NOT NULL signifie qu'on n'accepte pas de case vide. NOT NULL constraint failed: clients.prenom
 
 🧩 **Défi** — mes requêtes / ma solution :
 
