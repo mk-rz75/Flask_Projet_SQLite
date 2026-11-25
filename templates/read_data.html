@@ -19,6 +19,7 @@
             <th>Nom</th>
             <th>Prénom</th>
             <th>Adresse</th>
+            <th>Téléphone</th>
             <th>Actions</th>
         </tr>
         {% for row in data %}
@@ -28,6 +29,7 @@
             <td><a href="/fiche_client/{{ row['id'] }}">{{ row['nom'] }}</a></td>
             <td>{{ row['prenom'] }}</td>
             <td>{{ row['adresse'] }}</td>
+            <td>{{ row['telephone'] or '-' }}</td>
                         <td>
                             <a href="/modifier_client/{{ row['id'] }}">✏️ Modifier</a>
                 <form action="/supprimer_client/{{ row['id'] }}" method="post"

@@ -99,6 +99,7 @@ def enregistrer_client():
     nom = request.form.get('nom', '').strip().upper()
     prenom = request.form.get('prenom', '').strip()
     adresse = request.form.get('adresse', '').strip()
+    telephone = request.form.get('telephone', '').strip()
 
     if not nom or not prenom or not adresse:
         return render_template('formulaire.html', erreur="Tous les champs sont obligatoires."), 400
@@ -108,7 +109,7 @@ def enregistrer_client():
     cursor = conn.cursor()
 
     # Exécution de la requête SQL pour insérer un nouveau client
-    cursor.execute('INSERT INTO clients (nom, prenom, adresse) VALUES (?, ?, ?)', (nom, prenom, adresse))
+    cursor.execute('INSERT INTO clients (nom, prenom, adresse, telephone) VALUES (?, ?, ?, ?)', (nom, prenom, adresse, telephone))
     conn.commit()
     conn.close()
     return redirect('/consultation/')  # Rediriger vers la liste des clients après l'enregistrement
@@ -156,11 +157,12 @@ def modifier_client(id):
     cursor = conn.cursor()
 
     if request.method == 'POST':
-        cursor.execute('UPDATE clients SET nom = ?, prenom = ?, adresse = ? WHERE id = ?',
-                       (request.form['nom'].strip().upper(),
-                        request.form['prenom'].strip(),
-                        request.form['adresse'].strip(),
-                        id))
+        cursor.execute('UPDATE clients SET nom = ?, prenom = ?, adresse = ?, telephone = ? WHERE id = ?',
+                (request.form['nom'].strip().upper(),
+                request.form['prenom'].strip(),
+                request.form['adresse'].strip(),
+                request.form.get('telephone', '').strip(),
+                id))
         conn.commit()
         conn.close()
         return redirect('/consultation/')
