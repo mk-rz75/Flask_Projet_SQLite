@@ -122,6 +122,19 @@ def fiche_nom(nom):
     conn.close()
     return render_template('read_data.html', data=data)
 
+@app.route('/recherche')
+def recherche():
+    q = request.args.get('q', '').strip()
+    data = []
+    if q:
+        conn = get_db()
+        cursor = conn.cursor()
+        motif = '%' + q + '%'
+        cursor.execute('SELECT * FROM clients WHERE nom LIKE ? OR prenom LIKE ? ORDER BY nom',
+                       (motif, motif))
+        data = cursor.fetchall()
+        conn.close()
+    return render_template('recherche.html', q=q, data=data)
 
 # ---------------------------------------------------------------
 #  Ne pas modifier : utile seulement pour lancer le site
