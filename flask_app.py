@@ -28,6 +28,7 @@ def get_db():
     """Ouvre une connexion à la base de données SQLite."""
     conn = sqlite3.connect(DATABASE)
     conn.row_factory = sqlite3.Row
+    conn.execute('PRAGMA foreign_keys = ON')
     return conn
 
 # Fonction pour savoir si l'utilisateur s'est authentifié
@@ -147,10 +148,13 @@ def recherche():
 @app.route('/supprimer_client/<int:id>', methods=['POST'])
 def supprimer_client(id):
     conn = get_db()
-    cursor = conn.cursor()
-    cursor.execute('DELETE FROM clients WHERE id = ?', (id,))
-    conn.commit()
-    conn.close()
+    try:
+        conn.execute('DELETE FROM clients WHERE id = ?', (id,))
+        conn.commit()
+    except sqlite3.IntegrityError:
+        return "<h2>Impossible de supprimer ce client : il a des commandes.</h2>", 409
+    finally:
+        conn.close()
     return redirect('/consultation/')
 
 @app.route('/modifier_client/<int:id>', methods=['GET', 'POST'])
