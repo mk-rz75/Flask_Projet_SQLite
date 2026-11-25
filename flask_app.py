@@ -73,6 +73,9 @@ def Readfiche(post_id):
     data = cursor.fetchall()
     conn.close()
     # Rendre le template HTML et transmettre les données
+    if not data:
+        return "<h2>Client introuvable</h2>", 404
+
     return render_template('read_data.html', data=data)
 
 
