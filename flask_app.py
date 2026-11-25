@@ -27,7 +27,8 @@ DATABASE = os.path.join(BASE_DIR, 'database.db')
 def get_db():
     """Ouvre une connexion à la base de données SQLite."""
     return sqlite3.connect(DATABASE)
-
+    conn.row_factory = sqlite3.Row
+    return conn
 
 # Fonction pour savoir si l'utilisateur s'est authentifié
 def est_authentifie():
