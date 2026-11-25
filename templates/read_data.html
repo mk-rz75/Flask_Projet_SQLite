@@ -40,5 +40,17 @@
         </tr>
         {% endfor %}
     </table>
+        {% if commandes is defined %}
+    <h2>Commandes du client</h2>
+    {% if commandes %}
+    <ul>
+        {% for c in commandes %}
+        <li>{{ c['produit'] }} : {{ c['montant'] }} € ({{ c['date_commande'] }})</li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>Aucune commande.</p>
+    {% endif %}
+    {% endif %}
 </body>
 </html>

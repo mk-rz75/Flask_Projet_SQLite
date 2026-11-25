@@ -71,12 +71,14 @@ def Readfiche(post_id):
     cursor = conn.cursor()
     cursor.execute('SELECT * FROM clients WHERE id = ?', (post_id,))
     data = cursor.fetchall()
+    cursor.execute('SELECT * FROM commandes WHERE client_id = ? ORDER BY date_commande DESC', (post_id,))
+    commandes = cursor.fetchall()
     conn.close()
     # Rendre le template HTML et transmettre les données
     if not data:
         return "<h2>Client introuvable</h2>", 404
 
-    return render_template('read_data.html', data=data)
+    return render_template('read_data.html', data=data, commandes=commandes)
 
 
 @app.route('/consultation/')
@@ -173,6 +175,30 @@ def modifier_client(id):
     if client is None:
         return "<h2>Client introuvable</h2>", 404
     return render_template('modifier_client.html', client=client)
+
+@app.route('/commandes/')
+def liste_commandes():
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute('''SELECT commandes.id, clients.nom, clients.prenom, commandes.produit, commandes.montant
+                      FROM commandes
+                      JOIN clients ON commandes.client_id = clients.id''')
+    commandes = cursor.fetchall()
+    conn.close()
+    return render_template('commandes.html', commandes=commandes)
+
+@app.route('/statistiques/')
+def statistiques():
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute('''SELECT clients.nom, COUNT(commandes.id) AS nb_commandes, COALESCE(SUM(commandes.montant), 0) AS total
+                      FROM clients
+                      LEFT JOIN commandes ON commandes.client_id = clients.id
+                      GROUP BY clients.id
+                      ORDER BY total DESC''')
+    stats = cursor.fetchall()
+    conn.close()
+    return render_template('statistiques.html', stats=stats)
 
 # ---------------------------------------------------------------
 #  Ne pas modifier : utile seulement pour lancer le site
