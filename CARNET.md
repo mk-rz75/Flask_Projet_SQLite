@@ -189,19 +189,19 @@
 
 1. Quelle est la différence entre une page HTML et une réponse JSON ? À qui chacune est-elle destinée ?
 
-   > _Ma réponse :_ 
+   > _Ma réponse : Ma réponse : Une page HTML c'est fait pour être affiché et lu par un humain dans un navigateur. Le JSON c'est juste les données brutes, fait pour être lu par un programme, comme une appli mobile ou un script.
 
 2. Que signifient les codes `200`, `201`, `400`, `401` et `404` renvoyés par votre API ?
 
-   > _Ma réponse :_ 
+   > _Ma réponse : Ma réponse : 200 = ok, 201 = client créé, 400 = il manque des champs, 401 = pas connecté en admin, 404 = client introuvable.
 
 3. Pourquoi une API renvoie-t-elle une erreur JSON plutôt qu'une redirection vers la page de connexion ?
 
-   > _Ma réponse :_ 
+   > _Ma réponse : Ma réponse : Parce que c'est un programme qui utilise l'API, pas un humain. Il ne peut pas remplir un formulaire de connexion, il a besoin d'un message d'erreur qu'il peut lire.
 
 4. Citez une application de votre téléphone qui, selon vous, utilise une API. Quelles données échange-t-elle ?
 
-   > _Ma réponse :_ 
+   > _Ma réponse : Ma réponse : L'appli météo. Elle demande la météo de ma ville à une API et reçoit la température, le vent et les prévisions en JSON.
 
 ---
 
