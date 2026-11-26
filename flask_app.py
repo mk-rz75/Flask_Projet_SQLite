@@ -34,6 +34,8 @@ def get_db():
 # Fonction pour savoir si l'utilisateur s'est authentifié
 def est_authentifie():
     return session.get('authentifie')
+def a_le_role(*roles):
+    return session.get('role') in roles
 
 
 @app.route('/')
@@ -51,17 +53,21 @@ def lecture():
     return "<h2>Bravo, vous êtes authentifié</h2>"
 
 
+COMPTES = {
+    'admin': {'mot_de_passe': 'password', 'role': 'admin'},
+    'user': {'mot_de_passe': '12345', 'role': 'user'},
+}
+
 @app.route('/authentification', methods=['GET', 'POST'])
 def authentification():
     if request.method == 'POST':
-        # Vérifier les identifiants
-        if request.form['username'] == 'admin' and request.form['password'] == 'password':  # password à cacher par la suite
+        compte = COMPTES.get(request.form['username'])
+        if compte and request.form['password'] == compte['mot_de_passe']:
             session['authentifie'] = True
-            # Rediriger vers la route lecture après une authentification réussie
+            session['utilisateur'] = request.form['username']
+            session['role'] = compte['role']
             return redirect(url_for('lecture'))
-        else:
-            # Afficher un message d'erreur si les identifiants sont incorrects
-            return render_template('formulaire_authentification.html', error=True)
+        return render_template('formulaire_authentification.html', error=True)
 
     return render_template('formulaire_authentification.html', error=False)
 
@@ -203,6 +209,11 @@ def statistiques():
     stats = cursor.fetchall()
     conn.close()
     return render_template('statistiques.html', stats=stats)
+
+@app.route('/deconnexion')
+def deconnexion():
+    session.clear()
+    return redirect('/')
 
 # ---------------------------------------------------------------
 #  Ne pas modifier : utile seulement pour lancer le site
