@@ -250,6 +250,8 @@ def api_un_client(id):
 
 @app.post('/api/clients')
 def api_creer_client():
+    if not a_le_role('admin'):
+        return jsonify({'erreur': 'Authentification administrateur requise'}), 401
     donnees = request.get_json(silent=True) or {}
     nom = str(donnees.get('nom', '')).strip().upper()
     prenom = str(donnees.get('prenom', '')).strip()
