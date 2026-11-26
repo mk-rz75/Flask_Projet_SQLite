@@ -547,6 +547,37 @@ def admin_emprunts():
     return render_template('admin_emprunts.html', emprunts=emprunts)
 
 
+def livre_en_json(livre):
+    donnees = dict(livre)
+    donnees['disponible'] = livre['nb_disponibles'] > 0
+    return donnees
+
+
+@app.get('/api/livres')
+def api_liste_livres():
+    q = request.args.get('q', '').strip()
+    motif = '%' + q + '%'
+    conn = get_db()
+    livres = conn.execute(REQUETE_LIVRES + '''
+                          WHERE livres.titre LIKE ? OR livres.auteur LIKE ?
+                          GROUP BY livres.id
+                          ORDER BY livres.titre''', (motif, motif)).fetchall()
+    conn.close()
+    return jsonify([livre_en_json(livre) for livre in livres])
+
+
+@app.get('/api/livres/<int:id>')
+def api_un_livre(id):
+    conn = get_db()
+    livre = conn.execute(REQUETE_LIVRES + '''
+                         WHERE livres.id = ?
+                         GROUP BY livres.id''', (id,)).fetchone()
+    conn.close()
+    if livre is None:
+        return jsonify({'erreur': 'Livre introuvable'}), 404
+    return jsonify(livre_en_json(livre))
+
+
 # ---------------------------------------------------------------
 #  Ne pas modifier : utile seulement pour lancer le site
 #  sur votre propre ordinateur (python flask_app.py)
