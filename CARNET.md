@@ -189,19 +189,19 @@
 
 1. Quelle est la différence entre une page HTML et une réponse JSON ? À qui chacune est-elle destinée ?
 
-   > _Ma réponse : Ma réponse : Une page HTML c'est fait pour être affiché et lu par un humain dans un navigateur. Le JSON c'est juste les données brutes, fait pour être lu par un programme, comme une appli mobile ou un script.
+   > _Ma réponse : Une page HTML c'est fait pour être affiché et lu par un humain dans un navigateur. Le JSON c'est juste les données brutes, fait pour être lu par un programme, comme une appli mobile ou un script.
 
 2. Que signifient les codes `200`, `201`, `400`, `401` et `404` renvoyés par votre API ?
 
-   > _Ma réponse : Ma réponse : 200 = ok, 201 = client créé, 400 = il manque des champs, 401 = pas connecté en admin, 404 = client introuvable.
+   > _Ma réponse : 200 = ok, 201 = client créé, 400 = il manque des champs, 401 = pas connecté en admin, 404 = client introuvable.
 
 3. Pourquoi une API renvoie-t-elle une erreur JSON plutôt qu'une redirection vers la page de connexion ?
 
-   > _Ma réponse : Ma réponse : Parce que c'est un programme qui utilise l'API, pas un humain. Il ne peut pas remplir un formulaire de connexion, il a besoin d'un message d'erreur qu'il peut lire.
+   > _Ma réponse : Parce que c'est un programme qui utilise l'API, pas un humain. Il ne peut pas remplir un formulaire de connexion, il a besoin d'un message d'erreur qu'il peut lire.
 
 4. Citez une application de votre téléphone qui, selon vous, utilise une API. Quelles données échange-t-elle ?
 
-   > _Ma réponse : Ma réponse : L'appli météo. Elle demande la météo de ma ville à une API et reçoit la température, le vent et les prévisions en JSON.
+   > _Ma réponse : L'appli météo. Elle demande la météo de ma ville à une API et reçoit la température, le vent et les prévisions en JSON.
 
 ---
 
@@ -209,19 +209,19 @@
 
 1. Pourquoi ne supprime-t-on pas un emprunt quand le livre est rendu ?
 
-   > _Ma réponse :_ 
+   > _Ma réponse : Pour garder l'historique. Quand on rend un livre on remplit juste date_retour, comme ça on sait qui a emprunté quoi et quand, et la page Mes emprunts peut afficher les anciens emprunts._
 
 2. Pourquoi calculer la disponibilité d'un livre plutôt que de la stocker dans une colonne ?
 
-   > _Ma réponse :_ 
+   > _Ma réponse : Si on la stocke, il faut penser à la mettre à jour à chaque emprunt et à chaque retour, et si on oublie une fois le chiffre devient faux. En la calculant (nb_exemplaires moins les emprunts en cours), elle est toujours juste._
 
 3. Quelle a été la plus grande difficulté rencontrée pendant le projet, et comment l'avez-vous surmontée ?
 
-   > _Ma réponse :_ 
+   > _Ma réponse : Garder les clients des exercices tout en ajoutant la bibliothèque dans la même base. create_db.py supprime tout, donc j'ai fait un script à part (create_bibliotheque.py) qui crée seulement les 3 tables du projet. Sinon les erreurs d'indentation en Python et les templates mal rangés, je les ai corrigés en testant chaque étape en ligne._
 
 4. Quelles fonctionnalités n'avez-vous pas eu le temps de réaliser ? Comment vous y prendriez-vous ?
 
-   > _Ma réponse :_ 
+   > _Ma réponse : Les bonus : les retards, la réservation et les statistiques. Pour les retards je ferais une page admin avec WHERE date_retour IS NULL AND date_retour_prevue < date('now'). Pour les stats un GROUP BY sur les emprunts pour avoir les livres les plus empruntés._
 
 ---
 
@@ -229,4 +229,4 @@
 
 En quelques phrases, expliquez à un ami ce qui se passe entre le moment où il clique sur « Enregistrer » dans un formulaire et celui où l'information s'affiche dans une liste :
 
-> _Ma réponse :_ 
+> _Ma réponse : Le formulaire envoie les données au serveur avec une requête POST. Flask les récupère avec request.form, vérifie qu'elles sont correctes, puis fait un INSERT dans la base SQLite et un commit. Ensuite il redirige vers la page de la liste : Flask fait un SELECT, met les lignes dans le template HTML et renvoie la page au navigateur._

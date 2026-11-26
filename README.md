@@ -1,3 +1,121 @@
+# 📚 Projet : Médiathèque (gestion de bibliothèque)
+
+Application Web Flask + SQLite pour gérer les prêts et les retours de livres d'une médiathèque.
+
+- **Site en ligne :** https://mkrz75.pythonanywhere.com/
+- **Dépôt :** https://github.com/mk-rz75/Flask_Projet_SQLite
+- **Auteur :** Mohamed Kasdi
+
+## 🔑 Comptes de test
+
+| Rôle | Login | Mot de passe |
+|---|---|---|
+| Administrateur | `admin` | `password` |
+| Utilisateur | `user` | `12345` |
+| Utilisateur | `user2` | `12345` |
+
+Les mots de passe sont stockés **hachés** (`generate_password_hash` / `check_password_hash`).
+
+## ✅ Fonctionnalités
+
+| # | Fonctionnalité | État |
+|---|---|---|
+| F1 | Enregistrer, modifier et supprimer un livre (admin) | ✅ |
+| F2 | Gérer le nombre d'exemplaires de chaque livre (admin) | ✅ |
+| F3 | Rechercher un livre (titre, auteur) et voir sa disponibilité | ✅ |
+| F4 | Emprunter un livre disponible | ✅ |
+| F5 | Rendre un livre (l'utilisateur, ou l'admin depuis « Emprunts en cours ») | ✅ |
+| F6 | Voir mes emprunts en cours (et mon historique) | ✅ |
+| F7 | Gérer les utilisateurs : créer, lister, supprimer (admin) | ✅ |
+| F8 | Contrôle d'accès utilisateur / administrateur | ✅ |
+| F9 | API JSON des livres avec leur disponibilité | ✅ |
+
+**Règles de gestion** (refus avec un message clair) :
+
+| Règle | Gestion |
+|---|---|
+| R1 – Livre sans exemplaire disponible | Refus 409 « Tous les exemplaires sont déjà empruntés » |
+| R2 – Plus de 3 emprunts en cours | Refus 409 |
+| R3 – Supprimer un livre en cours d'emprunt | Refus 409 |
+| R4 – Pages d'administration sans être admin | Code 403 « Accès refusé » |
+| R5 – Livre sans titre ou sans auteur | Formulaire réaffiché avec un message (400) |
+
+En plus : on ne peut pas emprunter deux fois le même livre en même temps, on ne peut pas descendre le stock sous le nombre d'exemplaires empruntés, et un admin ne peut pas supprimer son propre compte ni un utilisateur qui a des emprunts en cours.
+
+**Non réalisé :** les bonus (retards, statistiques, recommandations, réservation, API d'emprunt).
+
+## 🗄️ Modèle de données
+
+```mermaid
+erDiagram
+    UTILISATEURS ||--o{ EMPRUNTS : "effectue"
+    LIVRES ||--o{ EMPRUNTS : "fait l'objet de"
+    LIVRES {
+        int id PK
+        text titre
+        text auteur
+        text isbn
+        int annee
+        text genre
+        int nb_exemplaires
+    }
+    UTILISATEURS {
+        int id PK
+        text login
+        text nom
+        text prenom
+        text mot_de_passe_hash
+        text role
+    }
+    EMPRUNTS {
+        int id PK
+        int livre_id FK
+        int utilisateur_id FK
+        timestamp date_emprunt
+        date date_retour_prevue
+        timestamp date_retour
+    }
+```
+
+- Un **emprunt en cours** est un emprunt dont `date_retour` est `NULL`. Rendre un livre remplit `date_retour` : l'emprunt n'est pas supprimé, ce qui garde l'historique.
+- La **disponibilité** est calculée : `nb_exemplaires - COUNT(emprunts en cours)`.
+- Le schéma complet est dans `schema.sql`. Les tables du projet et les données d'exemple sont créées par `create_bibliotheque.py`, sans toucher aux tables `clients` et `commandes` des exercices :
+  ```bash
+  cd ~/mysite
+  python3 create_bibliotheque.py
+  ```
+
+## 🧭 Routes
+
+| Méthode | Route | Accès | Rôle |
+|---|---|---|---|
+| GET | `/` | Tous | Accueil avec menu |
+| GET, POST | `/authentification` | Tous | Connexion |
+| GET | `/deconnexion` | Tous | Déconnexion |
+| GET | `/livres?q=...` | Connecté | Catalogue + recherche + disponibilité |
+| POST | `/emprunter/<livre_id>` | Connecté | Emprunter un livre |
+| GET | `/mes_emprunts` | Connecté | Mes emprunts en cours et mon historique |
+| POST | `/rendre/<emprunt_id>` | Propriétaire ou admin | Rendre un livre |
+| GET | `/admin` | Admin | Tableau de bord |
+| GET, POST | `/admin/livres/ajouter` | Admin | Ajouter un livre |
+| GET, POST | `/admin/livres/<id>/modifier` | Admin | Modifier un livre et son stock |
+| POST | `/admin/livres/<id>/supprimer` | Admin | Supprimer un livre |
+| GET | `/admin/utilisateurs` | Admin | Liste et création des comptes |
+| POST | `/admin/utilisateurs/ajouter` | Admin | Créer un compte |
+| POST | `/admin/utilisateurs/<id>/supprimer` | Admin | Supprimer un compte |
+| GET | `/admin/emprunts` | Admin | Tous les emprunts en cours |
+
+## 🔌 API
+
+| Méthode | Route | Réponse |
+|---|---|---|
+| GET | `/api/livres` | Liste des livres avec `nb_disponibles` et `disponible` (accepte `?q=`) |
+| GET | `/api/livres/<id>` | Un livre, ou `{"erreur": "Livre introuvable"}` (404) |
+
+Les routes des exercices 1 à 9 (clients, commandes, `/api/clients`) sont toujours disponibles.
+
+---
+
 # 🗄️ Atelier « Flask + SQLite » : construire une application avec une base de données
 
 Bienvenue ! 👋
