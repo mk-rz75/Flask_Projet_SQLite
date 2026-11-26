@@ -12,7 +12,7 @@
 import os
 import sqlite3
 
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 
 app = Flask(__name__)
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'  # Clé secrète pour signer les sessions (à cacher par la suite)
@@ -230,6 +230,23 @@ def statistiques():
 def deconnexion():
     session.clear()
     return redirect('/')
+
+@app.get('/api/clients')
+def api_liste_clients():
+    conn = get_db()
+    rows = conn.execute('SELECT * FROM clients ORDER BY nom').fetchall()
+    conn.close()
+    return jsonify([dict(row) for row in rows])
+
+
+@app.get('/api/clients/<int:id>')
+def api_un_client(id):
+    conn = get_db()
+    row = conn.execute('SELECT * FROM clients WHERE id = ?', (id,)).fetchone()
+    conn.close()
+    if row is None:
+        return jsonify({'erreur': 'Client introuvable'}), 404
+    return jsonify(dict(row))
 
 # ---------------------------------------------------------------
 #  Ne pas modifier : utile seulement pour lancer le site
