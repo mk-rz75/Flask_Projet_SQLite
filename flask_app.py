@@ -248,6 +248,24 @@ def api_un_client(id):
         return jsonify({'erreur': 'Client introuvable'}), 404
     return jsonify(dict(row))
 
+@app.post('/api/clients')
+def api_creer_client():
+    donnees = request.get_json(silent=True) or {}
+    nom = str(donnees.get('nom', '')).strip().upper()
+    prenom = str(donnees.get('prenom', '')).strip()
+    adresse = str(donnees.get('adresse', '')).strip()
+
+    if not nom or not prenom or not adresse:
+        return jsonify({'erreur': 'Les champs nom, prenom et adresse sont obligatoires'}), 400
+
+    conn = get_db()
+    cursor = conn.execute('INSERT INTO clients (nom, prenom, adresse) VALUES (?, ?, ?)',
+                          (nom, prenom, adresse))
+    conn.commit()
+    nouvel_id = cursor.lastrowid
+    conn.close()
+    return jsonify({'id': nouvel_id, 'nom': nom, 'prenom': prenom, 'adresse': adresse}), 201
+
 # ---------------------------------------------------------------
 #  Ne pas modifier : utile seulement pour lancer le site
 #  sur votre propre ordinateur (python flask_app.py)
