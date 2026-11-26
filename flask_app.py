@@ -13,6 +13,7 @@ import os
 import sqlite3
 
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'  # Clé secrète pour signer les sessions (à cacher par la suite)
@@ -38,6 +39,14 @@ def a_le_role(*roles):
     return session.get('role') in roles
 
 
+def message(titre, texte, code=200, lien='/livres'):
+    return render_template('message.html', titre=titre, message=texte, lien=lien), code
+
+
+def acces_refuse():
+    return message('Accès refusé', 'Cette page est réservée aux administrateurs.', 403, '/')
+
+
 @app.route('/')
 def hello_world():
     return render_template('hello.html')
@@ -53,20 +62,21 @@ def lecture():
     return "<h2>Bravo, vous êtes authentifié</h2>"
 
 
-COMPTES = {
-    'admin': {'mot_de_passe': 'password', 'role': 'admin'},
-    'user': {'mot_de_passe': '12345', 'role': 'user'},
-}
-
 @app.route('/authentification', methods=['GET', 'POST'])
 def authentification():
     if request.method == 'POST':
-        compte = COMPTES.get(request.form['username'])
-        if compte and request.form['password'] == compte['mot_de_passe']:
+        login = request.form.get('username', '').strip()
+        mot_de_passe = request.form.get('password', '')
+        conn = get_db()
+        utilisateur = conn.execute('SELECT * FROM utilisateurs WHERE login = ?', (login,)).fetchone()
+        conn.close()
+        if utilisateur and check_password_hash(utilisateur['mot_de_passe_hash'], mot_de_passe):
+            session.clear()
             session['authentifie'] = True
-            session['utilisateur'] = request.form['username']
-            session['role'] = compte['role']
-            return redirect(url_for('lecture'))
+            session['utilisateur'] = utilisateur['login']
+            session['utilisateur_id'] = utilisateur['id']
+            session['role'] = utilisateur['role']
+            return redirect('/livres')
         return render_template('formulaire_authentification.html', error=True)
 
     return render_template('formulaire_authentification.html', error=False)
@@ -280,6 +290,8 @@ REQUETE_LIVRES = '''SELECT livres.*,
 
 @app.route('/livres')
 def liste_livres():
+    if not a_le_role('user', 'admin'):
+        return redirect(url_for('authentification'))
     q = request.args.get('q', '').strip()
     motif = '%' + q + '%'
     conn = get_db()
@@ -289,6 +301,13 @@ def liste_livres():
                           ORDER BY livres.titre''', (motif, motif)).fetchall()
     conn.close()
     return render_template('livres.html', livres=livres, q=q)
+
+
+@app.route('/admin')
+def admin():
+    if not a_le_role('admin'):
+        return acces_refuse()
+    return render_template('admin.html')
 
 
 # ---------------------------------------------------------------

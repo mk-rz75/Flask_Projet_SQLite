@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block titre %}Administration{% endblock %}
+{% block contenu %}
+<h1>Administration</h1>
+<p>Connecté en tant que <strong>{{ session['utilisateur'] }}</strong> (admin).</p>
+<ul>
+    <li><a href="/livres">Gérer les livres</a></li>
+</ul>
+{% endblock %}
