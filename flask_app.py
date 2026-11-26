@@ -269,6 +269,29 @@ def api_creer_client():
     return jsonify({'id': nouvel_id, 'nom': nom, 'prenom': prenom, 'adresse': adresse}), 201
 
 # ---------------------------------------------------------------
+#  Projet bibliothèque
+# ---------------------------------------------------------------
+
+REQUETE_LIVRES = '''SELECT livres.*,
+                         livres.nb_exemplaires - COUNT(emprunts.id) AS nb_disponibles
+                  FROM livres
+                  LEFT JOIN emprunts ON emprunts.livre_id = livres.id AND emprunts.date_retour IS NULL'''
+
+
+@app.route('/livres')
+def liste_livres():
+    q = request.args.get('q', '').strip()
+    motif = '%' + q + '%'
+    conn = get_db()
+    livres = conn.execute(REQUETE_LIVRES + '''
+                          WHERE livres.titre LIKE ? OR livres.auteur LIKE ?
+                          GROUP BY livres.id
+                          ORDER BY livres.titre''', (motif, motif)).fetchall()
+    conn.close()
+    return render_template('livres.html', livres=livres, q=q)
+
+
+# ---------------------------------------------------------------
 #  Ne pas modifier : utile seulement pour lancer le site
 #  sur votre propre ordinateur (python flask_app.py)
 # ---------------------------------------------------------------

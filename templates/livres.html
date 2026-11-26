@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block titre %}Catalogue{% endblock %}
+{% block contenu %}
+<h1>Catalogue des livres</h1>
+
+<form action="/livres" method="get">
+    <input type="text" name="q" value="{{ q }}" placeholder="Titre ou auteur...">
+    <button type="submit">Rechercher</button>
+    {% if q %}<a href="/livres">Tout afficher</a>{% endif %}
+</form>
+
+<p>{{ livres|length }} livre(s){% if q %} pour « {{ q }} »{% endif %}.</p>
+
+<table border="1">
+    <tr>
+        <th>Titre</th>
+        <th>Auteur</th>
+        <th>Année</th>
+        <th>Genre</th>
+        <th>Exemplaires</th>
+        <th>Disponibles</th>
+    </tr>
+    {% for livre in livres %}
+    <tr>
+        <td>{{ livre['titre'] }}</td>
+        <td>{{ livre['auteur'] }}</td>
+        <td>{{ livre['annee'] or '-' }}</td>
+        <td>{{ livre['genre'] or '-' }}</td>
+        <td>{{ livre['nb_exemplaires'] }}</td>
+        <td>
+            {% if livre['nb_disponibles'] > 0 %}
+                ✅ {{ livre['nb_disponibles'] }}
+            {% else %}
+                ❌ Indisponible
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}
