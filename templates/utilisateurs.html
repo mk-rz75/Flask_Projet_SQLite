@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block titre %}Utilisateurs{% endblock %}
+{% block contenu %}
+<h1>Gestion des utilisateurs</h1>
+
+<h2>Créer un compte</h2>
+{% if erreur %}
+    <p style="color: red;">{{ erreur }}</p>
+{% endif %}
+<form action="/admin/utilisateurs/ajouter" method="post">
+    <label>Login : <input type="text" name="login" value="{{ form.get('login', '') }}" required></label><br><br>
+    <label>Nom : <input type="text" name="nom" value="{{ form.get('nom', '') }}" required></label><br><br>
+    <label>Prénom : <input type="text" name="prenom" value="{{ form.get('prenom', '') }}" required></label><br><br>
+    <label>Mot de passe : <input type="password" name="mot_de_passe" required></label><br><br>
+    <label>Rôle :
+        <select name="role">
+            <option value="user">user</option>
+            <option value="admin" {% if form.get('role') == 'admin' %}selected{% endif %}>admin</option>
+        </select>
+    </label><br><br>
+    <button type="submit">Créer</button>
+</form>
+
+<h2>Liste des comptes ({{ utilisateurs|length }})</h2>
+<table border="1">
+    <tr>
+        <th>Login</th>
+        <th>Nom</th>
+        <th>Prénom</th>
+        <th>Rôle</th>
+        <th>Emprunts en cours</th>
+        <th>Action</th>
+    </tr>
+    {% for u in utilisateurs %}
+    <tr>
+        <td>{{ u['login'] }}</td>
+        <td>{{ u['nom'] }}</td>
+        <td>{{ u['prenom'] }}</td>
+        <td>{{ u['role'] }}</td>
+        <td>{{ u['nb_en_cours'] }}</td>
+        <td>
+            {% if u['id'] != session['utilisateur_id'] %}
+            <form action="/admin/utilisateurs/{{ u['id'] }}/supprimer" method="post"
+                  onsubmit="return confirm('Supprimer ce compte ?');">
+                <button type="submit">🗑️ Supprimer</button>
+            </form>
+            {% else %}
+            (vous)
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

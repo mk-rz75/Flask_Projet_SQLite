@@ -467,6 +467,86 @@ def rendre(emprunt_id):
     return redirect(request.referrer or '/mes_emprunts')
 
 
+def page_utilisateurs(erreur=None, form=None, code=200):
+    conn = get_db()
+    utilisateurs = conn.execute('''SELECT utilisateurs.*, COUNT(emprunts.id) AS nb_en_cours
+                                  FROM utilisateurs
+                                  LEFT JOIN emprunts ON emprunts.utilisateur_id = utilisateurs.id AND emprunts.date_retour IS NULL
+                                  GROUP BY utilisateurs.id
+                                  ORDER BY utilisateurs.login''').fetchall()
+    conn.close()
+    return render_template('utilisateurs.html', utilisateurs=utilisateurs, erreur=erreur, form=form or {}), code
+
+
+@app.route('/admin/utilisateurs')
+def liste_utilisateurs():
+    if not a_le_role('admin'):
+        return acces_refuse()
+    return page_utilisateurs()
+
+
+@app.route('/admin/utilisateurs/ajouter', methods=['POST'])
+def ajouter_utilisateur():
+    if not a_le_role('admin'):
+        return acces_refuse()
+    login = request.form.get('login', '').strip()
+    nom = request.form.get('nom', '').strip().upper()
+    prenom = request.form.get('prenom', '').strip()
+    mot_de_passe = request.form.get('mot_de_passe', '')
+    role = request.form.get('role', 'user')
+
+    if not login or not nom or not prenom or not mot_de_passe:
+        return page_utilisateurs('Tous les champs sont obligatoires.', request.form, 400)
+    if role not in ('user', 'admin'):
+        return page_utilisateurs('Rôle invalide.', request.form, 400)
+
+    conn = get_db()
+    try:
+        conn.execute('INSERT INTO utilisateurs (login, nom, prenom, mot_de_passe_hash, role) VALUES (?, ?, ?, ?, ?)',
+                     (login, nom, prenom, generate_password_hash(mot_de_passe), role))
+        conn.commit()
+    except sqlite3.IntegrityError:
+        return page_utilisateurs(f"Le login « {login} » existe déjà.", request.form, 409)
+    finally:
+        conn.close()
+    return redirect('/admin/utilisateurs')
+
+
+@app.route('/admin/utilisateurs/<int:id>/supprimer', methods=['POST'])
+def supprimer_utilisateur(id):
+    if not a_le_role('admin'):
+        return acces_refuse()
+    if id == session.get('utilisateur_id'):
+        return message('Suppression impossible', 'Vous ne pouvez pas supprimer votre propre compte.', 409, '/admin/utilisateurs')
+    conn = get_db()
+    try:
+        en_cours = conn.execute('SELECT COUNT(*) FROM emprunts WHERE utilisateur_id = ? AND date_retour IS NULL', (id,)).fetchone()[0]
+        if en_cours > 0:
+            return message('Suppression impossible', f"Cet utilisateur a encore {en_cours} livre(s) en cours d'emprunt.", 409, '/admin/utilisateurs')
+        conn.execute('DELETE FROM utilisateurs WHERE id = ?', (id,))
+        conn.commit()
+    except sqlite3.IntegrityError:
+        return message('Suppression impossible', "Cet utilisateur a un historique d'emprunts.", 409, '/admin/utilisateurs')
+    finally:
+        conn.close()
+    return redirect('/admin/utilisateurs')
+
+
+@app.route('/admin/emprunts')
+def admin_emprunts():
+    if not a_le_role('admin'):
+        return acces_refuse()
+    conn = get_db()
+    emprunts = conn.execute('''SELECT emprunts.*, livres.titre, utilisateurs.login, utilisateurs.nom, utilisateurs.prenom
+                              FROM emprunts
+                              JOIN livres ON emprunts.livre_id = livres.id
+                              JOIN utilisateurs ON emprunts.utilisateur_id = utilisateurs.id
+                              WHERE emprunts.date_retour IS NULL
+                              ORDER BY emprunts.date_retour_prevue''').fetchall()
+    conn.close()
+    return render_template('admin_emprunts.html', emprunts=emprunts)
+
+
 # ---------------------------------------------------------------
 #  Ne pas modifier : utile seulement pour lancer le site
 #  sur votre propre ordinateur (python flask_app.py)
