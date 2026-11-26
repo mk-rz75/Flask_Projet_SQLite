@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block titre %}Mes emprunts{% endblock %}
+{% block contenu %}
+<h1>Mes emprunts</h1>
+
+<h2>En cours ({{ en_cours|length }} / 3)</h2>
+{% if en_cours %}
+<table border="1">
+    <tr>
+        <th>Titre</th>
+        <th>Auteur</th>
+        <th>Emprunté le</th>
+        <th>À rendre avant le</th>
+        <th>Action</th>
+    </tr>
+    {% for e in en_cours %}
+    <tr>
+        <td>{{ e['titre'] }}</td>
+        <td>{{ e['auteur'] }}</td>
+        <td>{{ e['date_emprunt'] }}</td>
+        <td>{{ e['date_retour_prevue'] }}</td>
+        <td>
+            <form action="/rendre/{{ e['id'] }}" method="post">
+                <button type="submit">📥 Rendre</button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+<p>Aucun emprunt en cours. <a href="/livres">Voir le catalogue</a></p>
+{% endif %}
+
+<h2>Historique</h2>
+{% if historique %}
+<ul>
+    {% for e in historique %}
+    <li>{{ e['titre'] }} : emprunté le {{ e['date_emprunt'] }}, rendu le {{ e['date_retour'] }}</li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>Aucun livre rendu pour l'instant.</p>
+{% endif %}
+{% endblock %}

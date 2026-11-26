@@ -397,6 +397,76 @@ def supprimer_livre(id):
     return redirect('/livres')
 
 
+MAX_EMPRUNTS = 3
+
+
+@app.route('/emprunter/<int:livre_id>', methods=['POST'])
+def emprunter(livre_id):
+    if not a_le_role('user', 'admin'):
+        return redirect(url_for('authentification'))
+    utilisateur_id = session['utilisateur_id']
+    conn = get_db()
+    try:
+        livre = conn.execute(REQUETE_LIVRES + '''
+                             WHERE livres.id = ?
+                             GROUP BY livres.id''', (livre_id,)).fetchone()
+        if livre is None:
+            return message('Livre introuvable', "Ce livre n'existe pas.", 404)
+        if livre['nb_disponibles'] <= 0:
+            return message('Emprunt impossible', f"Tous les exemplaires de « {livre['titre']} » sont déjà empruntés.", 409)
+
+        nb_en_cours = conn.execute('SELECT COUNT(*) FROM emprunts WHERE utilisateur_id = ? AND date_retour IS NULL',
+                                   (utilisateur_id,)).fetchone()[0]
+        if nb_en_cours >= MAX_EMPRUNTS:
+            return message('Emprunt impossible', f"Vous avez déjà {MAX_EMPRUNTS} livres en cours d'emprunt. Rendez-en un avant d'en emprunter un autre.", 409, '/mes_emprunts')
+
+        deja = conn.execute('SELECT COUNT(*) FROM emprunts WHERE utilisateur_id = ? AND livre_id = ? AND date_retour IS NULL',
+                            (utilisateur_id, livre_id)).fetchone()[0]
+        if deja:
+            return message('Emprunt impossible', f"Vous avez déjà emprunté « {livre['titre']} ».", 409, '/mes_emprunts')
+
+        conn.execute("INSERT INTO emprunts (livre_id, utilisateur_id, date_retour_prevue) VALUES (?, ?, date('now', '+14 days'))",
+                     (livre_id, utilisateur_id))
+        conn.commit()
+    finally:
+        conn.close()
+    return redirect('/mes_emprunts')
+
+
+@app.route('/mes_emprunts')
+def mes_emprunts():
+    if not a_le_role('user', 'admin'):
+        return redirect(url_for('authentification'))
+    conn = get_db()
+    requete = '''SELECT emprunts.*, livres.titre, livres.auteur
+                 FROM emprunts
+                 JOIN livres ON emprunts.livre_id = livres.id
+                 WHERE emprunts.utilisateur_id = ? AND emprunts.date_retour IS {} NULL
+                 ORDER BY emprunts.date_emprunt DESC'''
+    en_cours = conn.execute(requete.format(''), (session['utilisateur_id'],)).fetchall()
+    historique = conn.execute(requete.format('NOT'), (session['utilisateur_id'],)).fetchall()
+    conn.close()
+    return render_template('mes_emprunts.html', en_cours=en_cours, historique=historique)
+
+
+@app.route('/rendre/<int:emprunt_id>', methods=['POST'])
+def rendre(emprunt_id):
+    if not a_le_role('user', 'admin'):
+        return redirect(url_for('authentification'))
+    conn = get_db()
+    try:
+        emprunt = conn.execute('SELECT * FROM emprunts WHERE id = ? AND date_retour IS NULL', (emprunt_id,)).fetchone()
+        if emprunt is None:
+            return message('Retour impossible', "Cet emprunt n'existe pas ou le livre a déjà été rendu.", 404, '/mes_emprunts')
+        if emprunt['utilisateur_id'] != session['utilisateur_id'] and not a_le_role('admin'):
+            return message('Accès refusé', "Cet emprunt ne vous appartient pas.", 403, '/mes_emprunts')
+        conn.execute('UPDATE emprunts SET date_retour = CURRENT_TIMESTAMP WHERE id = ?', (emprunt_id,))
+        conn.commit()
+    finally:
+        conn.close()
+    return redirect(request.referrer or '/mes_emprunts')
+
+
 # ---------------------------------------------------------------
 #  Ne pas modifier : utile seulement pour lancer le site
 #  sur votre propre ordinateur (python flask_app.py)

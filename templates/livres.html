@@ -2,6 +2,7 @@
 {% block titre %}Catalogue{% endblock %}
 {% block contenu %}
 <h1>Catalogue des livres</h1>
+<p><a href="/mes_emprunts">📖 Mes emprunts</a></p>
 
 <form action="/livres" method="get">
     <input type="text" name="q" value="{{ q }}" placeholder="Titre ou auteur...">
@@ -23,6 +24,7 @@
         <th>Genre</th>
         <th>Exemplaires</th>
         <th>Disponibles</th>
+        <th>Emprunt</th>
         {% if session['role'] == 'admin' %}<th>Actions</th>{% endif %}
     </tr>
     {% for livre in livres %}
@@ -37,6 +39,15 @@
                 ✅ {{ livre['nb_disponibles'] }}
             {% else %}
                 ❌ Indisponible
+            {% endif %}
+        </td>
+        <td>
+            {% if livre['nb_disponibles'] > 0 %}
+            <form action="/emprunter/{{ livre['id'] }}" method="post">
+                <button type="submit">📚 Emprunter</button>
+            </form>
+            {% else %}
+            -
             {% endif %}
         </td>
         {% if session['role'] == 'admin' %}
