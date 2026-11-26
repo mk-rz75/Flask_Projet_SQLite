@@ -74,6 +74,8 @@ def authentification():
 
 @app.route('/fiche_client/<int:post_id>')
 def Readfiche(post_id):
+    if not a_le_role('user', 'admin'):
+        return redirect(url_for('authentification'))
     conn = get_db()
     cursor = conn.cursor()
     cursor.execute('SELECT * FROM clients WHERE id = ?', (post_id,))
@@ -90,6 +92,8 @@ def Readfiche(post_id):
 
 @app.route('/consultation/')
 def ReadBDD():
+    if not a_le_role('user', 'admin'):
+        return redirect(url_for('authentification'))
     conn = get_db()
     cursor = conn.cursor()
     cursor.execute('SELECT * FROM clients ORDER BY nom;')
@@ -100,11 +104,15 @@ def ReadBDD():
 
 @app.route('/enregistrer_client', methods=['GET'])
 def formulaire_client():
+    if not a_le_role('admin'):
+        return "<h2>Accès refusé : réservé aux administrateurs</h2>", 403
     return render_template('formulaire.html')  # afficher le formulaire
 
 
 @app.route('/enregistrer_client', methods=['POST'])
 def enregistrer_client():
+    if not a_le_role('admin'):
+        return "<h2>Accès refusé : réservé aux administrateurs</h2>", 403
     nom = request.form.get('nom', '').strip().upper()
     prenom = request.form.get('prenom', '').strip()
     adresse = request.form.get('adresse', '').strip()
@@ -129,6 +137,8 @@ def enregistrer_client():
 # ---------------------------------------------------------------
 @app.route('/fiche_nom/<nom>')
 def fiche_nom(nom):
+    if not a_le_role('user', 'admin'):
+        return redirect(url_for('authentification'))
     conn = get_db()
     cursor = conn.cursor()
     cursor.execute('SELECT * FROM clients WHERE nom = ?', (nom,))
@@ -138,6 +148,8 @@ def fiche_nom(nom):
 
 @app.route('/recherche')
 def recherche():
+    if not a_le_role('user', 'admin'):
+        return redirect(url_for('authentification'))
     q = request.args.get('q', '').strip()
     data = []
     if q:
@@ -153,6 +165,8 @@ def recherche():
 
 @app.route('/supprimer_client/<int:id>', methods=['POST'])
 def supprimer_client(id):
+    if not a_le_role('admin'):
+        return "<h2>Accès refusé : réservé aux administrateurs</h2>", 403
     conn = get_db()
     try:
         conn.execute('DELETE FROM clients WHERE id = ?', (id,))
@@ -165,6 +179,8 @@ def supprimer_client(id):
 
 @app.route('/modifier_client/<int:id>', methods=['GET', 'POST'])
 def modifier_client(id):
+    if not a_le_role('admin'):
+        return "<h2>Accès refusé : réservé aux administrateurs</h2>", 403
     conn = get_db()
     cursor = conn.cursor()
 

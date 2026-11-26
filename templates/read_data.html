@@ -30,12 +30,14 @@
             <td>{{ row['prenom'] }}</td>
             <td>{{ row['adresse'] }}</td>
             <td>{{ row['telephone'] or '-' }}</td>
-                        <td>
-                            <a href="/modifier_client/{{ row['id'] }}">✏️ Modifier</a>
+            <td>
+                {% if session['role'] == 'admin' %}
+                <a href="/modifier_client/{{ row['id'] }}">✏️ Modifier</a>
                 <form action="/supprimer_client/{{ row['id'] }}" method="post"
                       onsubmit="return confirm('Supprimer ce client ?');">
                     <button type="submit">🗑️ Supprimer</button>
                 </form>
+                {% endif %}
             </td>
         </tr>
         {% endfor %}
