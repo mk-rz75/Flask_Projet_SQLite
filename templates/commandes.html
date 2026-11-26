@@ -1,28 +1,23 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>Commandes</title>
-</head>
-<body>
-    <h1>Liste des commandes</h1>
-    <p>{{ commandes|length }} commande(s).</p>
-    <table border="1">
-        <tr>
-            <th>N°</th>
-            <th>Client</th>
-            <th>Produit</th>
-            <th>Montant</th>
-        </tr>
-        {% for c in commandes %}
-        <tr>
-            <td>{{ c['id'] }}</td>
-            <td>{{ c['nom'] }} {{ c['prenom'] }}</td>
-            <td>{{ c['produit'] }}</td>
-            <td>{{ c['montant'] }} €</td>
-        </tr>
-        {% endfor %}
-    </table>
-    <p><a href="/consultation/">Retour aux clients</a></p>
-</body>
-</html>
+{% extends "base.html" %}
+{% block titre %}Commandes{% endblock %}
+{% block contenu %}
+<h1>Liste des commandes</h1>
+<p>{{ commandes|length }} commande(s).</p>
+<table>
+    <tr>
+        <th>N°</th>
+        <th>Client</th>
+        <th>Produit</th>
+        <th>Montant</th>
+    </tr>
+    {% for c in commandes %}
+    <tr>
+        <td>{{ c['id'] }}</td>
+        <td>{{ c['nom'] }} {{ c['prenom'] }}</td>
+        <td>{{ c['produit'] }}</td>
+        <td>{{ c['montant'] }} €</td>
+    </tr>
+    {% endfor %}
+</table>
+<p><a href="/consultation/">Retour aux clients</a></p>
+{% endblock %}

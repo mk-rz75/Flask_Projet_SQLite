@@ -1,19 +1,35 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flask + SQLite</title>
-</head>
-<body>
-    <h1>Hello from Flask Server ! 🚀</h1>
-    <p>Votre application est en ligne. Voici les pages disponibles :</p>
+{% extends "base.html" %}
+{% block titre %}Accueil{% endblock %}
+{% block contenu %}
+<h1>Bienvenue à la médiathèque 📚</h1>
+<p>Cette application permet de consulter le catalogue, d'emprunter et de rendre des livres en ligne.</p>
+
+{% if session.get('utilisateur') %}
+    <p>Bonjour <strong>{{ session['utilisateur'] }}</strong> !</p>
     <ul>
-        <li><a href="/consultation/">/consultation/</a> : la liste des clients</li>
-        <li><a href="/fiche_client/1">/fiche_client/1</a> : la fiche du client n°1</li>
-        <li><a href="/enregistrer_client">/enregistrer_client</a> : enregistrer un nouveau client</li>
-        <li><a href="/lecture">/lecture</a> : une page protégée</li>
-        <li><a href="/authentification">/authentification</a> : se connecter</li>
+        <li><a href="/livres">Rechercher un livre dans le catalogue</a></li>
+        <li><a href="/mes_emprunts">Voir mes emprunts en cours</a></li>
+        {% if session['role'] == 'admin' %}
+        <li><a href="/admin">Espace administration</a> : livres, utilisateurs, emprunts</li>
+        {% endif %}
     </ul>
-</body>
-</html>
+{% else %}
+    <p><a href="/authentification">Connectez-vous</a> pour consulter le catalogue et emprunter des livres.</p>
+{% endif %}
+
+<h2>API</h2>
+<ul>
+    <li><a href="/api/livres">/api/livres</a> : tous les livres avec leur disponibilité (JSON)</li>
+    <li><a href="/api/livres/1">/api/livres/1</a> : un livre (JSON)</li>
+</ul>
+
+<h2>Exercices de l'atelier (gestion des clients)</h2>
+<ul>
+    <li><a href="/consultation/">/consultation/</a> : la liste des clients</li>
+    <li><a href="/recherche">/recherche</a> : rechercher un client</li>
+    <li><a href="/enregistrer_client">/enregistrer_client</a> : enregistrer un nouveau client</li>
+    <li><a href="/commandes/">/commandes/</a> : les commandes</li>
+    <li><a href="/statistiques/">/statistiques/</a> : statistiques par client</li>
+    <li><a href="/api/clients">/api/clients</a> : API des clients</li>
+</ul>
+{% endblock %}

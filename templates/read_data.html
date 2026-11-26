@@ -1,58 +1,48 @@
-<!DOCTYPE>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>Clients</title>
-    <style>
-    table { border-collapse: collapse; }
-    th, td { border: 1px solid #ccc; padding: 6px 12px; }
-    th { background: #f0f0f0; }
-</style>
-</head>
-<body>
-    <h1>Liste des Clients</h1>
-    <p>{{ data|length }} client(s) dans la base.</p>
-    <table>
-        <tr>
-            <th>ID</th>
-            <th>Création</th>
-            <th>Nom</th>
-            <th>Prénom</th>
-            <th>Adresse</th>
-            <th>Téléphone</th>
-            <th>Actions</th>
-        </tr>
-        {% for row in data %}
-        <tr>
-            <td>{{ row['id'] }}</td>
-            <td>{{ row['created'] }}</td>
-            <td><a href="/fiche_client/{{ row['id'] }}">{{ row['nom'] }}</a></td>
-            <td>{{ row['prenom'] }}</td>
-            <td>{{ row['adresse'] }}</td>
-            <td>{{ row['telephone'] or '-' }}</td>
-            <td>
-                {% if session['role'] == 'admin' %}
-                <a href="/modifier_client/{{ row['id'] }}">✏️ Modifier</a>
-                <form action="/supprimer_client/{{ row['id'] }}" method="post"
-                      onsubmit="return confirm('Supprimer ce client ?');">
-                    <button type="submit">🗑️ Supprimer</button>
-                </form>
-                {% endif %}
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
-        {% if commandes is defined %}
-    <h2>Commandes du client</h2>
-    {% if commandes %}
-    <ul>
-        {% for c in commandes %}
-        <li>{{ c['produit'] }} : {{ c['montant'] }} € ({{ c['date_commande'] }})</li>
-        {% endfor %}
-    </ul>
-    {% else %}
-    <p>Aucune commande.</p>
-    {% endif %}
-    {% endif %}
-</body>
-</html>
+{% extends "base.html" %}
+{% block titre %}Clients{% endblock %}
+{% block contenu %}
+<h1>Liste des Clients</h1>
+<p>{{ data|length }} client(s) dans la base.</p>
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Création</th>
+        <th>Nom</th>
+        <th>Prénom</th>
+        <th>Adresse</th>
+        <th>Téléphone</th>
+        <th>Actions</th>
+    </tr>
+    {% for row in data %}
+    <tr>
+        <td>{{ row['id'] }}</td>
+        <td>{{ row['created'] }}</td>
+        <td><a href="/fiche_client/{{ row['id'] }}">{{ row['nom'] }}</a></td>
+        <td>{{ row['prenom'] }}</td>
+        <td>{{ row['adresse'] }}</td>
+        <td>{{ row['telephone'] or '-' }}</td>
+        <td>
+            {% if session['role'] == 'admin' %}
+            <a href="/modifier_client/{{ row['id'] }}">✏️ Modifier</a>
+            <form action="/supprimer_client/{{ row['id'] }}" method="post"
+                  onsubmit="return confirm('Supprimer ce client ?');">
+                <button type="submit">🗑️ Supprimer</button>
+            </form>
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+    {% if commandes is defined %}
+<h2>Commandes du client</h2>
+{% if commandes %}
+<ul>
+    {% for c in commandes %}
+    <li>{{ c['produit'] }} : {{ c['montant'] }} € ({{ c['date_commande'] }})</li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>Aucune commande.</p>
+{% endif %}
+{% endif %}
+{% endblock %}

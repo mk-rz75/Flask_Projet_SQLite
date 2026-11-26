@@ -1,25 +1,20 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>Statistiques</title>
-</head>
-<body>
-    <h1>Statistiques par client</h1>
-    <table border="1">
-        <tr>
-            <th>Client</th>
-            <th>Nombre de commandes</th>
-            <th>Total</th>
-        </tr>
-        {% for s in stats %}
-        <tr>
-            <td>{{ s['nom'] }}</td>
-            <td>{{ s['nb_commandes'] }}</td>
-            <td>{{ s['total'] }} €</td>
-        </tr>
-        {% endfor %}
-    </table>
-    <p><a href="/consultation/">Retour aux clients</a></p>
-</body>
-</html>
+{% extends "base.html" %}
+{% block titre %}Statistiques{% endblock %}
+{% block contenu %}
+<h1>Statistiques par client</h1>
+<table>
+    <tr>
+        <th>Client</th>
+        <th>Nombre de commandes</th>
+        <th>Total</th>
+    </tr>
+    {% for s in stats %}
+    <tr>
+        <td>{{ s['nom'] }}</td>
+        <td>{{ s['nb_commandes'] }}</td>
+        <td>{{ s['total'] }} €</td>
+    </tr>
+    {% endfor %}
+</table>
+<p><a href="/consultation/">Retour aux clients</a></p>
+{% endblock %}

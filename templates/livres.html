@@ -2,7 +2,6 @@
 {% block titre %}Catalogue{% endblock %}
 {% block contenu %}
 <h1>Catalogue des livres</h1>
-<p><a href="/mes_emprunts">📖 Mes emprunts</a></p>
 
 <form action="/livres" method="get">
     <input type="text" name="q" value="{{ q }}" placeholder="Titre ou auteur...">
@@ -16,7 +15,7 @@
 
 <p>{{ livres|length }} livre(s){% if q %} pour « {{ q }} »{% endif %}.</p>
 
-<table border="1">
+<table>
     <tr>
         <th>Titre</th>
         <th>Auteur</th>
