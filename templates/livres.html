@@ -9,6 +9,10 @@
     {% if q %}<a href="/livres">Tout afficher</a>{% endif %}
 </form>
 
+{% if session['role'] == 'admin' %}
+<p><a href="/admin/livres/ajouter">➕ Ajouter un livre</a></p>
+{% endif %}
+
 <p>{{ livres|length }} livre(s){% if q %} pour « {{ q }} »{% endif %}.</p>
 
 <table border="1">
@@ -19,6 +23,7 @@
         <th>Genre</th>
         <th>Exemplaires</th>
         <th>Disponibles</th>
+        {% if session['role'] == 'admin' %}<th>Actions</th>{% endif %}
     </tr>
     {% for livre in livres %}
     <tr>
@@ -34,6 +39,15 @@
                 ❌ Indisponible
             {% endif %}
         </td>
+        {% if session['role'] == 'admin' %}
+        <td>
+            <a href="/admin/livres/{{ livre['id'] }}/modifier">✏️ Modifier</a>
+            <form action="/admin/livres/{{ livre['id'] }}/supprimer" method="post"
+                  onsubmit="return confirm('Supprimer ce livre ?');">
+                <button type="submit">🗑️ Supprimer</button>
+            </form>
+        </td>
+        {% endif %}
     </tr>
     {% endfor %}
 </table>

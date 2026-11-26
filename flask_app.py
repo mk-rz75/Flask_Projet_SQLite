@@ -310,6 +310,93 @@ def admin():
     return render_template('admin.html')
 
 
+def lire_formulaire_livre():
+    livre = {
+        'titre': request.form.get('titre', '').strip(),
+        'auteur': request.form.get('auteur', '').strip(),
+        'isbn': request.form.get('isbn', '').strip(),
+        'annee': request.form.get('annee', '').strip(),
+        'genre': request.form.get('genre', '').strip(),
+        'nb_exemplaires': request.form.get('nb_exemplaires', '').strip(),
+    }
+    if not livre['titre'] or not livre['auteur']:
+        return livre, "Le titre et l'auteur sont obligatoires."
+    if livre['annee'] and not livre['annee'].isdigit():
+        return livre, "L'année doit être un nombre."
+    if not livre['nb_exemplaires'].isdigit():
+        return livre, "Le nombre d'exemplaires doit être un nombre positif."
+    livre['annee'] = int(livre['annee']) if livre['annee'] else None
+    livre['nb_exemplaires'] = int(livre['nb_exemplaires'])
+    return livre, None
+
+
+@app.route('/admin/livres/ajouter', methods=['GET', 'POST'])
+def ajouter_livre():
+    if not a_le_role('admin'):
+        return acces_refuse()
+    if request.method == 'GET':
+        return render_template('livre_form.html', titre_page='Ajouter un livre', livre={})
+
+    livre, erreur = lire_formulaire_livre()
+    if erreur:
+        return render_template('livre_form.html', titre_page='Ajouter un livre', livre=livre, erreur=erreur), 400
+
+    conn = get_db()
+    conn.execute('INSERT INTO livres (titre, auteur, isbn, annee, genre, nb_exemplaires) VALUES (?, ?, ?, ?, ?, ?)',
+                 (livre['titre'], livre['auteur'], livre['isbn'], livre['annee'], livre['genre'], livre['nb_exemplaires']))
+    conn.commit()
+    conn.close()
+    return redirect('/livres')
+
+
+@app.route('/admin/livres/<int:id>/modifier', methods=['GET', 'POST'])
+def modifier_livre(id):
+    if not a_le_role('admin'):
+        return acces_refuse()
+    conn = get_db()
+    livre_actuel = conn.execute('SELECT * FROM livres WHERE id = ?', (id,)).fetchone()
+    if livre_actuel is None:
+        conn.close()
+        return message('Livre introuvable', "Ce livre n'existe pas.", 404)
+
+    if request.method == 'GET':
+        conn.close()
+        return render_template('livre_form.html', titre_page='Modifier un livre', livre=livre_actuel)
+
+    livre, erreur = lire_formulaire_livre()
+    if not erreur:
+        en_cours = conn.execute('SELECT COUNT(*) FROM emprunts WHERE livre_id = ? AND date_retour IS NULL', (id,)).fetchone()[0]
+        if livre['nb_exemplaires'] < en_cours:
+            erreur = f"Impossible : {en_cours} exemplaire(s) de ce livre sont en cours d'emprunt."
+    if erreur:
+        conn.close()
+        return render_template('livre_form.html', titre_page='Modifier un livre', livre=livre, erreur=erreur), 400
+
+    conn.execute('UPDATE livres SET titre = ?, auteur = ?, isbn = ?, annee = ?, genre = ?, nb_exemplaires = ? WHERE id = ?',
+                 (livre['titre'], livre['auteur'], livre['isbn'], livre['annee'], livre['genre'], livre['nb_exemplaires'], id))
+    conn.commit()
+    conn.close()
+    return redirect('/livres')
+
+
+@app.route('/admin/livres/<int:id>/supprimer', methods=['POST'])
+def supprimer_livre(id):
+    if not a_le_role('admin'):
+        return acces_refuse()
+    conn = get_db()
+    try:
+        en_cours = conn.execute('SELECT COUNT(*) FROM emprunts WHERE livre_id = ? AND date_retour IS NULL', (id,)).fetchone()[0]
+        if en_cours > 0:
+            return message('Suppression impossible', f"Ce livre a {en_cours} exemplaire(s) en cours d'emprunt.", 409)
+        conn.execute('DELETE FROM livres WHERE id = ?', (id,))
+        conn.commit()
+    except sqlite3.IntegrityError:
+        return message('Suppression impossible', "Ce livre a un historique d'emprunts. Mettez plutôt son nombre d'exemplaires à 0.", 409)
+    finally:
+        conn.close()
+    return redirect('/livres')
+
+
 # ---------------------------------------------------------------
 #  Ne pas modifier : utile seulement pour lancer le site
 #  sur votre propre ordinateur (python flask_app.py)
