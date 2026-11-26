@@ -165,23 +165,23 @@
 
 1. Quelle est la différence entre **authentification** et **autorisation** ?
 
-   > _Ma réponse :_ 
+   > _Ma réponse : L'authentification c'est vérifier qui on est, avec le login et le mot de passe. L'autorisation c'est ce qu'on a le droit de faire, selon son rôle (user ou admin).
 
 2. Où est stockée la session ? Comment le serveur sait-il qui vous êtes à chaque nouvelle requête ?
 
-   > _Ma réponse :_ 
+   > _Ma réponse : Dans un cookie du navigateur. À chaque requête le navigateur renvoie ce cookie, et le serveur le lit pour savoir qui on est et quel est notre rôle.
 
 3. Pourquoi masquer un bouton dans le HTML ne suffit-il pas à protéger une action ?
 
-   > _Ma réponse :_ 
+   > _Ma réponse : Parce qu'on peut recréer le bouton avec F12 ou envoyer la requête directement. Il faut que le serveur vérifie le rôle, sinon n'importe qui peut supprimer.
 
 4. Que signifient les codes `302` et `403` ? Dans quel cas votre application renvoie-t-elle chacun d'eux ?
 
-   > _Ma réponse :_ 
+   > _Ma réponse : 302 c'est une redirection : mon appli l'envoie quand on n'est pas connecté, pour aller vers la page de connexion. 403 ça veut dire accès interdit : quand un user essaie d'enregistrer, modifier ou supprimer un client.
 
 5. Le mot de passe `password` est écrit en clair dans `flask_app.py`, sur un dépôt **public**. Quel est le risque ? Quelle solution avez-vous déjà rencontrée dans cet atelier pour cacher une information sensible ?
 
-   > _Ma réponse :_ 
+   > _Ma réponse : N'importe qui peut lire le code sur GitHub et se connecter en admin. La solution c'est les secrets GitHub (Settings → Secrets), qu'on a utilisés pour le déploiement sur PythonAnywhere.
 
 ---
 
